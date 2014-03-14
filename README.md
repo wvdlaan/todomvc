@@ -158,7 +158,10 @@ You can put a transaction on this channel with
 The browser-tab will automatically update as the transaction is
 processed within the go-block.
 
-## Running some tests
+## Render test
+
+React, combination with `.requestAnimationFrame`, will avoid much
+of the rendering. Let's test that this is true.
 
 To remove the current todo's from the list run:
 
@@ -193,6 +196,5 @@ rendering.
     (put! (:channel app-hook) [:remove-item id])))
 ```
 
-Is it faster? I'm not sure to be honest. I've got no experience with
-tuning web UI's. I tried to look at my watch but that feels I bit
-silly. That's it for now. I hope you enjoyed the walkthrough.
+On my machine I'm not seeing any intermediate rendering. So it seems like
+React is doing its job! That's it for now. I hope you enjoyed the walkthrough.
