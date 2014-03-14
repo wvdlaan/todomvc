@@ -22,7 +22,7 @@ git and Light Table.
 4. Open `index.html` with a browser
 5. Open the browser console (`ctrl-shift-i` in Chrome)
 
-After each transaction the application logs the transact plus the
+After each transaction the application logs the transaction plus the
 application state. So, just use the application and watch the log-messages
 in the browser-console. This should give you an idea how your actions in
 the UI relate to transactions and state-changes in the application.
@@ -36,14 +36,14 @@ the UI relate to transactions and state-changes in the application.
 
      _Choose a client type_ -> _Browser_
 
-     You are connection to `about:blank` as can been seen at the bottom of
+     You are looking at `about:blank` as can been seen at the bottom of
      the browser-tab.
 
 3. Return to the browser to copy the URL
    (eg; on my desktop it's `file:///home/walter/todomvc/index.html`)
 4. Paste the URL in Light Table to replace `about:blank` and press enter.
 
-# Open the Clojurescript code in a Light Table tab
+## Open the Clojurescript code in a Light Table tab
 
 You have now opened the todo-application in a Light Table browser-tab. Next we
 will connect this application to the corresponding Clojurescript code.
@@ -160,8 +160,8 @@ processed within the go-block.
 
 ## Render test
 
-React, combination with `.requestAnimationFrame`, will avoid much
-of the rendering. Let's test that this is true.
+React, in combination with `.requestAnimationFrame`, will avoid much
+of the rendering. Let's see this in action.
 
 To remove the current todo's from the list run:
 
@@ -177,9 +177,8 @@ And you can populate the table with generated items like this:
   (put! (:channel app-hook) [:add-item (str "Have fun " i)]))
 ```
 
-That took a noticable amount of time on my machine. Let's now combine the
-adding and removing to see if our application does indeed avoid most of the
-rendering.
+Now we combine the adding and removing to see if our application does indeed
+avoid most of the rendering.
 
 ```clojure
 (let [num 200]
