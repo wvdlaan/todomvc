@@ -86,7 +86,7 @@ To look at the list of todo-items evaluate
 (:items @(:state app-hook))
 ```
 
-If you get [] as an answer it means that your todo-list is empty.
+If you get `[]` as an answer it means that your todo-list is empty.
 Click on 'What needs to be done?' in the browser-tab and enter some
 todo's. Now go back to `core.cljs` tab, put
 the cursor right after `(:items @(:state app-hook))` and press
@@ -109,9 +109,7 @@ without changing the application state.
 Let's try this by toggling the status of all items with:
 
 ```clojure
-(data/transact
- @(:state app-hook)
- [:toggle-all])
+(data/transact @(:state app-hook) [:toggle-all])
 ```
 
 Depending on the state of your application this will change `:all-done?`
