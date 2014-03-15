@@ -196,4 +196,133 @@ avoid most of the rendering.
 ```
 
 On my machine I'm not seeing any intermediate rendering. So it seems like
-React is doing its job! That's it for now. I hope you enjoyed the walkthrough.
+React is doing its job!
+
+## The render request
+
+All rendering is handled in `render.cljs`. The easiest way to open `render.cljs` is to
+position the cursor in any occurance of `render/request-render` and press `ctrl-.`,
+ie: _control_ + _dot_.
+
+This will take you to the definition of `request-render`.
+`request-render` uses a boolean atom, `render-pending`,
+in combination with `.requestAnimationFrame` to make sure that the total amount of renders
+will be less or equal to the browser refresh rate.
+
+The function that is scheduled to perform the rendering is `q/render`. This is the top-level `quiescent`
+function. It takes two arguments.
+
+1. `(App @state channel)` will render the application UI
+2. `(.getElementByIdj js/document "todoapp")` points to the DOM-element that will be handled by React.
+   You can find the definition of this element in `index.html`.
+   It is element `<section id="todoapp"></section>` .
+
+## Quiescent dom-elements
+
+If you look at the definition of `App` in `render.cljs` you find several calls to functions like
+`d/div`, `d/section`, `d/output`, etc.
+These are Quiescent-funcions that represent html-elements.
+Open the elements-tab in your browser and check for yourself that there is a one-on-one relationship
+between the elements defined in `App` and the html-elements within `<section id="todoapp"></section>`.
+
+[Here](https://github.com/levand/quiescent/blob/master/docs.md#creating-virtual-dom-elements)
+you can find more documentation on these dom-elements.
+
+Let's look, for example, at this expression at the end of the `Footer` component:
+
+```clojure
+(when (< 0 completed)
+  (d/button {:id "clear-completed"
+             :onClick #(go (>! channel [:clear-completed]))}
+            (str "Clear completed (" completed ")")))
+```
+
+This defines a button that will only by included in the UI if the number of `completed` items
+is larger than zero. If the button is clicked transaction `[:clear-completed]` is
+pushed on the `core.asyn` channel.
+
+Again, you can check this in the elements-tab of your browser. Add an item, mark it as completed
+and do _inspect element_ on the `Clear completed (1)` button that appears in the bottom right of
+the UI. This element shows up exactly were it is defined in `render.cljs`, at the end of `footer`.
+
+You will not see the `:onClick` in the browser. This is because events are handled in the
+virtual dom of React.
+For Chrome you can install _React Developer Tools_.
+This will give you an extra Development Tool tab with React specific information like, eg,
+the event handlers.
+
+## Quiescent components
+
+Functions like `App` and `TodoList` are defined with `q/defcomponent`.
+These act like any other Clojure function apart from two special requirements:
+
+1. They all return a Quiescent dom-element as the function result
+2. The first argument specifies the `state` relevant for the component
+
+Some examples will help to clearify the second requirement.
+
+The `Header` component is called with `nil` as the first argument.
+If you look at the definition of `Header` you'll see why.
+`Header` is not using anything from the application `state`.
+Therefor `Header` will only be rendered once since no further rendering is needed.
+
+An other example is `Footer`.
+The first argument of `Footer` is `[current-filter items]`. Both `current-filter` and `items`
+come from `state`. They are passed to `Footer` in a vector because the first
+argument of `Footer` must contain all `state`.
+
+You could pass the complete `state` to `Footer`. But `Footer` does not depend on `:all-done?`,
+so, sending the complete `state` will cause unneeded rendering for `Footer`.
+
+## Changing the UI
+
+As an exercise we will change `Header` such that the
+text in the `new-todo` input changes to `"Anything more?"` if there
+are unfinished todo's.
+
+First we change `App` because it needs to send `all-done?` as an
+argument to `Header`.
+
+In `App` change this
+```clojure
+(Header nil channel)
+```
+to this
+```clojure
+(Header all-done? channel)
+```
+
+Now you have the evaluate `(d/defcomponent App ...)` with `ctrl-enter`.
+
+Next we move to `Header` to let it receive `all-done?` as first argument.
+
+In `Header` change this
+```clojure
+(q/defcomponent Header
+  "The page's header, which includes the primary input"
+  [_ channel]
+```
+to this
+```clojure
+(q/defcomponent Header
+  "The page's header, which includes the primary input"
+  [all-done? channel]
+```
+
+We also have to change the logic for `:placeholder`
+so we change this
+```clojure
+:placeholder "What needs to be done?"
+```
+to this
+```clojure
+:placeholder (if all-done?
+               "What needs to be done?"
+               "Anything more?")
+```
+
+Now you have the evaluate `(d/defcomponent Header ...)` with `ctrl-enter`.
+
+Enter some todo's in the list to check the new placeholder.
+
+That's it for now. I hope you enjoyed the walkthrough.
