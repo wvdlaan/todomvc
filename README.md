@@ -205,17 +205,16 @@ position the cursor in any occurance of `render/request-render` and press `ctrl-
 ie: _control_ + _dot_.
 
 This will take you to the definition of `request-render`.
-`request-render` uses a boolean atom, `render-pending`,
+`request-render` uses a boolean atom, `render-pending?`,
 in combination with `.requestAnimationFrame` to make sure that the total amount of renders
 will be less or equal to the browser refresh rate.
 
-The function that is scheduled to perform the rendering is `q/render`. This is the top-level `quiescent`
+The function that is scheduled to perform the rendering is `q/render`. This is the top-level Quiescent
 function. It takes two arguments.
 
 1. `(App @state channel)` will render the application UI
 2. `(.getElementByIdj js/document "todoapp")` points to the DOM-element that will be handled by React.
-   You can find the definition of this element in `index.html`.
-   It is element `<section id="todoapp"></section>` .
+   You can find the definition in `index.html` as element `<section id="todoapp"></section>`.
 
 ## Quiescent dom-elements
 
@@ -239,7 +238,7 @@ Let's look, for example, at this expression at the end of the `Footer` component
 
 This defines a button that will only by included in the UI if the number of `completed` items
 is larger than zero. If the button is clicked transaction `[:clear-completed]` is
-pushed on the `core.asyn` channel.
+pushed on the `core.async` channel.
 
 Again, you can check this in the elements-tab of your browser. Add an item, mark it as completed
 and do _inspect element_ on the `Clear completed (1)` button that appears in the bottom right of
@@ -261,10 +260,10 @@ These act like any other Clojure function apart from two special requirements:
 
 Some examples will help to clearify the second requirement.
 
-The `Header` component is called with `nil` as the first argument.
+The `Header` component is called with `nil` as first argument.
 If you look at the definition of `Header` you'll see why.
 `Header` is not using anything from the application `state`.
-Therefor `Header` will only be rendered once since no further rendering is needed.
+As a result it will only be rendered once since no further rendering is needed.
 
 An other example is `Footer`.
 The first argument of `Footer` is `[current-filter items]`. Both `current-filter` and `items`
