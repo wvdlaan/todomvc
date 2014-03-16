@@ -121,11 +121,14 @@
                     (TodoList [current-filter items] channel))
          (Footer [current-filter items] channel)))
 
+
+;; API
+
 ;; Here we use an atom to tell us if we already have a render queued
 ;; up; if so, requesting another render is a no-op
-(defn request-render
+(defn main
   "Render the given application state tree."
-  [{:keys [state channel render-pending?]}]
+  [{:keys [render-pending? state channel]}]
   (when (compare-and-set! render-pending? false true)
     (.requestAnimationFrame js/window
                             (fn []

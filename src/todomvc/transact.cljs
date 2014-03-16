@@ -1,4 +1,4 @@
-(ns todomvc.data
+(ns todomvc.transact
   "Contains functions for manipulating the application data")
 
 (defn update-item
@@ -85,7 +85,7 @@
    :next-id 10
    :items []})
 
-(defn transact
+(defn main
   [state transaction]
   (-> state
       (handle transaction)
@@ -94,4 +94,4 @@
 
 (defn try-transactions
   [transactions]
-  (reduce transact (initial-state) transactions))
+  (reduce main (initial-state) transactions))

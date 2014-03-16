@@ -1,8 +1,8 @@
-(ns todomvc.core
+(ns todomvc.application
   (:require [goog.events :as e]
             [cljs.core.async :refer [<! put! chan]]
             [todomvc.render :as render]
-            [todomvc.data :as data])
+            [todomvc.transact :as transact])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn state-to-string
@@ -28,31 +28,29 @@
 (defn load-app
   "Return a map containing the initial application"
   []
-  {:state (atom (data/initial-state))
+  {:state (atom (transact/initial-state))
    :channel (chan)
+   :transact transact/main
    :render-pending? (atom false)
-   :transact data/transact})
+   :render render/main})
 
 (defn init-updates
   "For every value coming from channel;
    - call transact to update the application state
    - trigger a render"
-  [{:keys [state channel transact] :as app}]
+  [{:keys [state channel transact render] :as app}]
   (go (while true
-        (let [transaction (<! channel)]
-          (swap! state transact transaction)
-          (pp-transaction transaction)
-          (pp-state @state)
-          ;; render after each state change
-          (render/request-render app)))))
+        (let [transaction (<! channel)] ; wait for next transaction
+          (swap! state transact transaction) ; process transaction
+          (pp-transaction transaction)       ; print transaction
+          (pp-state @state)           ; print state after transaction
+          (render app)))))            ; render after each state change
 
 (defn ^:export main
   "Application entry point"
   []
-  (let [app (load-app)]
+  (let [{:keys [state render] :as app} (load-app)]
     (init-updates app)
-    (pp-state @(:state app))
-    ;; initial render
-    (render/request-render app)
-    ;; hook for development/debugging
-    (def app-hook app)))
+    (pp-state @state)                 ; print initial state
+    (render app)                      ; initial render
+    (def app-hook app)))              ; hook for development/debugging

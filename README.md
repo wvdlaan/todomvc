@@ -1,26 +1,30 @@
 # Quiescent / Light Table walkthrough
 
-This walkthrough is based on a presentation that I recently gave at
-the Amsterdam Clojure Meetup.
+This walkthrough is based on a presentation that I gave at
+the Amsterdam Clojure Meetup in March 2014.
 
 The walkthrough uses [Light Table](http://www.lighttable.com/) and the
 [Quiescent TodoMVC](https://github.com/levand/todomvc/tree/gh-pages/architecture-examples/quiescent)
 to demonstrate what it feels like to develop a web-UI
 with [Quiescent](https://github.com/levand/quiescent).
 
-A personal goal is to gain experience with both Light Table and Quiescent.
-So, any help on how the workflow that I describe can be improved is highly appreciated.
+You don't need to know a lot about Clojure for this walkthrough.
+A basic understanding is enough IMO.
+This is thanks to Light Table and Quiescent.
+They have significantly lowered the barriers to entry.
 
-To follow along you need to install [leiningen](https://github.com/technomancy/leiningen),
+To follow along you need to install
+[leiningen](https://github.com/technomancy/leiningen),
 git and Light Table.
 
-## Get the TodoMVC application running on your machine
+## Open the TodoMVC application in your browser
 
 1. Clone this github repo
 2. Go to the repo with `cd todomvc`
 3. Run `lein cljsbuild once`
 4. Open `index.html` with a browser
-5. Open the browser console (`ctrl-shift-i` in Chrome)
+5. Open the browser development window (shift-ctrl-i)
+   and select the _console_ tab
 
 After each transaction the application logs the transaction plus the
 application state. So, just use the application and watch the log-messages
@@ -36,8 +40,8 @@ the UI relate to transactions and state-changes in the application.
 
      _Choose a client type_ -> _Browser_
 
-     You are looking at `about:blank` as can been seen at the bottom of
-     the browser-tab.
+     The browser-tab is displaying `about:blank` as can been seen
+     at the bottom left.
 
 3. Return to the browser to copy the URL
    (eg; on my desktop it's `file:///home/walter/todomvc/index.html`)
@@ -54,30 +58,30 @@ First let's open the code in a new Light Table tab.
    (eg; on my desktop it's `/home/walter/todomvc`)
 3. `ctrl-space` -> _Workspace: Toggle workspace tree_
    this will show/hide the workspace tree
-4. In the workspace tree (sidebar on the left) open `core.cljs` which you
-   will find in `todomvc/src/todomvc/core.cljs`
+4. In the workspace tree (sidebar on the left) open `application.cljs` which you
+   will find in `todomvc/src/todomvc/application.cljs`
 
-You now have two tabs in Light Table; `Quiescent TodoMVC` and `core.cljs`
+You now have two tabs in Light Table; `Quiescent TodoMVC` and `application.cljs`
 Let's put them side-by-side to get a better overview.
 
 5. `ctrl-space` -> _Tabset: Add a tabset_
 6. Drag one of the two tabs to the new tabset
 7. Hide the workspace tree with `ctrl-space` -> _Workspace: Toggle workspace tree_
 
-No further action is needed. The code in `core.cljs` is now connected to
+No further action is needed. The code in `application.cljs` is now connected to
 the todo-application in the browser-tab.
 Let's see what that brings us.
 
 ## Inspecting the application state
 
-Go to the end of `core.cljs`. The last line reads `(def app-hook app)`. This
+Go to the end of `application.cljs`. The last line reads `(def app-hook app)`. This
 makes the application available outside the `main` function so we can use
 this `app-hook` to sniff around in the application-state.
 
 To evaluate expressions in Light Table you have to position the cursor right
 after the expression and press `ctrl-enter`.
 For example, type `@(:state app-hook)` on a newline at the end of
-`core.cljs` and evaluate with `ctrl-enter`.
+`application.cljs` and evaluate with `ctrl-enter`.
 This will show the application-state.
 
 To look at the list of todo-items evaluate
@@ -88,16 +92,16 @@ To look at the list of todo-items evaluate
 
 If you get `[]` as an answer it means that your todo-list is empty.
 Click on 'What needs to be done?' in the browser-tab and enter some
-todo's. Now go back to `core.cljs` tab, put
+todo's. Now go back to `application.cljs` tab, put
 the cursor right after `(:items @(:state app-hook))` and press
 `ctrl-enter` again.
 
-This allows you the see how actions in the browser cause changes in
+This allows you the see how actions in the browser-tab cause changes in
 the application state.
 
 ## Changing the application state
 
-If you look a few lines up in `core.cljs` you'll see
+If you look a few lines up in `application.cljs` you'll see
 the expression `(swap! state transact transaction)` inside the
 `init-updates` function.
 This is the expression that processes the transactions coming in from
@@ -109,10 +113,10 @@ without changing the application state.
 Let's try this by toggling the status of all items with:
 
 ```clojure
-(data/transact @(:state app-hook) [:toggle-all])
+(transact/main @(:state app-hook) [:toggle-all])
 ```
 
-Depending on the state of your application this will change `:all-done?`
+Depending on the state of the application this will change `:all-done?`
 to either `true` or `false`. Now, evaluate the expression again.
 The value of `:all-done?` remains the same. This is because you are
 not changing the actual state of the application. The actual state of
@@ -121,7 +125,7 @@ the application is stored in the `(:state app-hook)` atom.
 Let's change the actual state by evaluating this expression:
 
 ```clojure
-(swap! (:state app-hook) data/transact [:toggle-all])
+(swap! (:state app-hook) transact/main [:toggle-all])
 ```
 
 That worked, the state has changed. And if you keep pressing
@@ -130,20 +134,21 @@ and `false`.
 
 ## Rendering the UI
 
-But the change is not shown in the browser-tab. Let's
+But the change is not shown in the browser-tab.
+To see the changed state reflected in the UI you must
 render the application by evaluating this expression:
 
 ```clojure
-(render/request-render app-hook)
+(render/main app-hook)
 ```
 
 Likewise you can add an item with
 
 ```clojure
-(swap! (:state app-hook) data/transact [:add-item "More work"])
+(swap! (:state app-hook) transact/main [:add-item "More work"])
 ```
 
-and show it in the browser-tab with `(render/request-render app-hook)`.
+and show it in the browser-tab with `(render/main app-hook)`.
 
 That's fun but a bit low level. The `init-updates` function creates a
 go-block that will patiently wait for a transaction coming in through a
@@ -201,28 +206,32 @@ React is doing its job!
 ## The render request
 
 All rendering is handled in `render.cljs`. The easiest way to open `render.cljs` is to
-position the cursor in any occurance of `render/request-render` and press `ctrl-.`,
+position the cursor in any occurance of `render/main` and press `ctrl-.`,
 ie: _control_ + _dot_.
 
 This will take you to the definition of `request-render`.
 `request-render` uses a boolean atom, `render-pending?`,
-in combination with `.requestAnimationFrame` to make sure that the total amount of renders
-will be less or equal to the browser refresh rate.
+in combination with `.requestAnimationFrame` to make sure that the total
+amount of renders will be less or equal to the browser refresh rate.
 
-The function that is scheduled to perform the rendering is `q/render`. This is the top-level Quiescent
-function. It takes two arguments.
+The function that is scheduled to perform the actual rendering is `q/render`.
+This is the top-level Quiescent function.
+It takes two arguments:
 
 1. `(App @state channel)` will render the application UI
-2. `(.getElementByIdj js/document "todoapp")` points to the DOM-element that will be handled by React.
-   You can find the definition in `index.html` as element `<section id="todoapp"></section>`.
+2. `(.getElementByIdj js/document "todoapp")` points to the DOM-element
+   that will be handled by React.
+   You can find the definition of `todoapp` in `index.html` as element
+   `<section id="todoapp"></section>`.
 
 ## Quiescent dom-elements
 
-If you look at the definition of `App` in `render.cljs` you find several calls to functions like
-`d/div`, `d/section`, `d/output`, etc.
+If you look at the definition of `App` in `render.cljs` you find several
+calls to functions like `d/div`, `d/section`, `d/output`, etc.
 These are Quiescent-funcions that represent html-elements.
-Open the elements-tab in your browser and check for yourself that there is a one-on-one relationship
-between the elements defined in `App` and the html-elements within `<section id="todoapp"></section>`.
+Open the elements-tab in your browser and check for yourself that there
+is a one-on-one relationship between the elements defined in `App` and
+the html-elements within `<section id="todoapp"></section>`.
 
 [Here](https://github.com/levand/quiescent/blob/master/docs.md#creating-virtual-dom-elements)
 you can find more documentation on these dom-elements.
@@ -236,19 +245,22 @@ Let's look, for example, at this expression at the end of the `Footer` component
             (str "Clear completed (" completed ")")))
 ```
 
-This defines a button that will only by included in the UI if the number of `completed` items
-is larger than zero. If the button is clicked transaction `[:clear-completed]` is
+This defines a button that will only by included in the UI if the number of
+`completed` items is larger than zero.
+If the button is clicked transaction `[:clear-completed]` is
 pushed on the `core.async` channel.
 
-Again, you can check this in the elements-tab of your browser. Add an item, mark it as completed
-and do _inspect element_ on the `Clear completed (1)` button that appears in the bottom right of
-the UI. This element shows up exactly were it is defined in `render.cljs`, at the end of `footer`.
+Again, you can check this in the elements-tab of your browser.
+Add an item, mark it as completed and do _inspect element_ on the
+`Clear completed (1)` button that appears in the bottom right of the UI.
+This element shows up exactly were it is defined in `render.cljs`,
+at the end of `footer`.
 
-You will not see the `:onClick` in the browser. This is because events are handled in the
-virtual dom of React.
+You will not see the `:onClick` in the browser.
+This is because events are handled in the React virtual dom.
 For Chrome you can install _React Developer Tools_.
-This will give you an extra Development Tool tab with React specific information like, eg,
-the event handlers.
+This will give you an extra Development Tool tab with React specific
+information like, eg, the event handlers.
 
 ## Quiescent components
 
@@ -261,17 +273,22 @@ These act like any other Clojure function apart from two special requirements:
 Some examples will help to clearify the second requirement.
 
 The `Header` component is called with `nil` as first argument.
-If you look at the definition of `Header` you'll see why.
+If you look at the definition of `Header` you will see why.
 `Header` is not using anything from the application `state`.
 As a result it will only be rendered once since no further rendering is needed.
 
 An other example is `Footer`.
-The first argument of `Footer` is `[current-filter items]`. Both `current-filter` and `items`
-come from `state`. They are passed to `Footer` in a vector because the first
+The first argument of `Footer` is `[current-filter items]`.
+Both `current-filter` and `items` come from `state`.
+They are passed to `Footer` in a vector because the first
 argument of `Footer` must contain all `state`.
 
-You could pass the complete `state` to `Footer`. But `Footer` does not depend on `:all-done?`,
-so, sending the complete `state` will cause unneeded rendering for `Footer`.
+You could pass the complete `state` to `Footer`.
+But `Footer` does not depend on `:all-done?`, so, sending the complete
+`state` will cause unneeded rendering for `Footer`.
+
+[Here](https://github.com/levand/quiescent/blob/master/docs.md#defining-components)
+you can find more documentation on these Quiescent-components.
 
 ## Changing the UI
 
@@ -293,7 +310,8 @@ to this
 
 Now you have the evaluate `(d/defcomponent App ...)` with `ctrl-enter`.
 
-Next we move to `Header` to let it receive `all-done?` as first argument.
+Next we move to `Header` (press ctrl-i while the cursor is positioned
+on `Header`) to let it receive `all-done?` as first argument.
 
 In `Header` change this
 ```clojure
@@ -323,5 +341,20 @@ to this
 Now you have the evaluate `(d/defcomponent Header ...)` with `ctrl-enter`.
 
 Enter some todo's in the list to check the new placeholder.
+
+## Compiling todomvc.cljs
+
+Let's check this change in the browser.
+
+1. Refresh the browser
+2. Enter some items
+
+Hmm, the new functionality for :placeholder has not reached the browser.
+Let's fix this by re-compiling todomvc.js.
+
+1. Save changes to `render.cljs` in Light Table with `ctrl-s`
+2. Recompile todomvc.js with `lein cljsbuild once`
+3. Refresh the browser
+4. Enter some items
 
 That's it for now. I hope you enjoyed the walkthrough.
