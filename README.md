@@ -342,19 +342,27 @@ Now you have the evaluate `(d/defcomponent Header ...)` with `ctrl-enter`.
 
 Enter some todo's in the list to check the new placeholder.
 
-## Compiling todomvc.cljs
+## Compiling todomvc.js
 
 Let's check this change in the browser.
 
 1. Refresh the browser
 2. Enter some items
 
-Hmm, the new functionality for :placeholder has not reached the browser.
-Let's fix this by re-compiling todomvc.js.
+Nothing has changed.
+The new functionality for :placeholder has not reached the browser.
 
-1. Save changes to `render.cljs` in Light Table with `ctrl-s`
+This is because `index.html` is using `todomvc.js` and Light Table
+does not update this file.
+Let's fix this by re-compiling `todomvc.js`.
+
+1. Save the changes you made to `render.cljs` in Light Table
+   with `ctrl-s`
 2. Recompile todomvc.js with `lein cljsbuild once`
 3. Refresh the browser
 4. Enter some items
 
-That's it for now. I hope you enjoyed the walkthrough.
+You can save yourself some time during development by
+running `lein cljsbuild auto`.
+This instructs `lein` to automatically re-compile `todomvc.js` whenever
+a source-file is saved.
