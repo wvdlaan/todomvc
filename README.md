@@ -203,14 +203,14 @@ avoid most of the rendering.
 On my machine I'm not seeing any intermediate rendering. So it seems like
 React is doing its job!
 
-## The render request
+## Rendering with Quiescent
 
 All rendering is handled in `render.cljs`. The easiest way to open `render.cljs` is to
 position the cursor in any occurance of `render/main` and press `ctrl-.`,
 ie: _control_ + _dot_.
 
-This will take you to the definition of `request-render`.
-`request-render` uses a boolean atom, `render-pending?`,
+This will take you to the definition of `render/main`.
+`render/main` uses a boolean atom, `render-pending?`,
 in combination with `.requestAnimationFrame` to make sure that the total
 amount of renders will be less or equal to the browser refresh rate.
 
@@ -229,8 +229,8 @@ It takes two arguments:
 If you look at the definition of `App` in `render.cljs` you find several
 calls to functions like `d/div`, `d/section`, `d/output`, etc.
 These are Quiescent-funcions that represent html-elements.
-Open the elements-tab in your browser and check for yourself that there
-is a one-on-one relationship between the elements defined in `App` and
+Open the elements-tab in your browser's development window and check for yourself
+that there is a one-on-one relationship between the elements defined in `App` and
 the html-elements within `<section id="todoapp"></section>`.
 
 [Here](https://github.com/levand/quiescent/blob/master/docs.md#creating-virtual-dom-elements)
