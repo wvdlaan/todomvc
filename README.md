@@ -17,6 +17,7 @@ To follow along you need to install
 [leiningen](https://github.com/technomancy/leiningen),
 git and Light Table.
 
+
 ## Open the TodoMVC application in your browser
 
 1. Clone this github repo
@@ -30,6 +31,7 @@ After each transaction the application logs the transaction plus the
 application state. So, just use the application and watch the log-messages
 in the browser-console. This should give you an idea how your actions in
 the UI relate to transactions and state-changes in the application.
+
 
 ## Open the TodoMVC application in a Light Table browser-tab
 
@@ -46,6 +48,7 @@ the UI relate to transactions and state-changes in the application.
 3. Return to the browser to copy the URL
    (eg; on my desktop it's `file:///home/walter/todomvc/index.html`)
 4. Paste the URL in Light Table to replace `about:blank` and press enter.
+
 
 ## Open the Clojurescript code in a Light Table tab
 
@@ -71,6 +74,7 @@ Let's put them side-by-side to get a better overview.
 No further action is needed. The code in `application.cljs` is now connected to
 the todo-application in the browser-tab.
 Let's see what that brings us.
+
 
 ## Inspecting the application state
 
@@ -98,6 +102,7 @@ the cursor right after `(:items @(:state app-hook))` and press
 
 This allows you the see how actions in the browser-tab cause changes in
 the application state.
+
 
 ## Changing the application state
 
@@ -132,6 +137,7 @@ That worked, the state has changed. And if you keep pressing
 `ctrl-enter` you can see the value of `:all-done?` alternate between `true`
 and `false`.
 
+
 ## Rendering the UI
 
 But the change is not shown in the browser-tab.
@@ -162,6 +168,7 @@ You can put a transaction on this channel with
 
 The browser-tab will automatically update as the transaction is
 processed within the go-block.
+
 
 ## Render test
 
@@ -203,13 +210,20 @@ avoid most of the rendering.
 On my machine I'm not seeing any intermediate rendering. So it seems like
 React is doing its job!
 
+
 ## Rendering with Quiescent
 
-All rendering is handled in `render.cljs`. The easiest way to open `render.cljs` is to
-position the cursor in any occurance of `render/main` and press `ctrl-.`,
-ie: _control_ + _dot_.
+All rendering is handled in `render.cljs`.
+We are going to use Light Table to jump to the definition of `render/main`.
+
+1. Move the cursor to any occurance of the string `render/main` within
+   file `application.cljs`
+2. `ctrl-space` -> _Editor: Jump to definition at cursor_
 
 This will take you to the definition of `render/main`.
+The keyboard shortcut for _Jump to definition_ is `ctrl-.` (control + dot).
+Likewise, `ctrl-,` (control + comma) takes you back to the previous position.
+
 `render/main` uses a boolean atom, `render-pending?`,
 in combination with `.requestAnimationFrame` to make sure that the total
 amount of renders will be less or equal to the browser refresh rate.
@@ -220,21 +234,22 @@ It takes two arguments:
 
 1. `(App @state channel)` will render the application UI
 2. `(.getElementByIdj js/document "todoapp")` points to the DOM-element
-   that will be handled by React.
+   that will be controlled by React.
    You can find the definition of `todoapp` in `index.html` as element
    `<section id="todoapp"></section>`.
+
 
 ## Quiescent dom-elements
 
 If you look at the definition of `App` in `render.cljs` you find several
 calls to functions like `d/div`, `d/section`, `d/output`, etc.
-These are Quiescent-funcions that represent html-elements.
+These are Quiescent-funcions that represent dom-elements.
 Open the elements-tab in your browser's development window and check for yourself
 that there is a one-on-one relationship between the elements defined in `App` and
-the html-elements within `<section id="todoapp"></section>`.
+the dom-elements within `<section id="todoapp"></section>`.
 
 [Here](https://github.com/levand/quiescent/blob/master/docs.md#creating-virtual-dom-elements)
-you can find more documentation on these dom-elements.
+you can find more documentation on Quiescent dom-elements.
 
 Let's look, for example, at this expression at the end of the `Footer` component:
 
@@ -247,7 +262,7 @@ Let's look, for example, at this expression at the end of the `Footer` component
 
 This defines a button that will only by included in the UI if the number of
 `completed` items is larger than zero.
-If the button is clicked transaction `[:clear-completed]` is
+If the button is clicked the `[:clear-completed]` transaction is
 pushed on the `core.async` channel.
 
 Again, you can check this in the elements-tab of your browser.
@@ -262,9 +277,11 @@ For Chrome you can install _React Developer Tools_.
 This will give you an extra Development Tool tab with React specific
 information like, eg, the event handlers.
 
+
 ## Quiescent components
 
-Functions like `App` and `TodoList` are defined with `q/defcomponent`.
+Functions like `App` and `TodoList` are Quiescent components defined
+with `q/defcomponent`.
 These act like any other Clojure function apart from two special requirements:
 
 1. They all return a Quiescent dom-element as the function result
@@ -288,7 +305,8 @@ But `Footer` does not depend on `:all-done?`, so, sending the complete
 `state` will cause unneeded rendering for `Footer`.
 
 [Here](https://github.com/levand/quiescent/blob/master/docs.md#defining-components)
-you can find more documentation on these Quiescent-components.
+you can find more documentation on Quiescent-components.
+
 
 ## Changing the UI
 
@@ -310,7 +328,7 @@ to this
 
 Now you have the evaluate `(d/defcomponent App ...)` with `ctrl-enter`.
 
-Next we move to `Header` (press ctrl-i while the cursor is positioned
+Next we move to `Header` (press `ctrl-.` while the cursor is positioned
 on `Header`) to let it receive `all-done?` as first argument.
 
 In `Header` change this
@@ -342,6 +360,7 @@ Now you have the evaluate `(d/defcomponent Header ...)` with `ctrl-enter`.
 
 Enter some todo's in the list to check the new placeholder.
 
+
 ## Compiling todomvc.js
 
 Let's check this change in the browser.
@@ -350,11 +369,11 @@ Let's check this change in the browser.
 2. Enter some items
 
 Nothing has changed.
-The new functionality for :placeholder has not reached the browser.
+The new functionality for `:placeholder` has not reached the browser.
 
 This is because `index.html` is using `todomvc.js` and Light Table
 does not update this file.
-Let's fix this by re-compiling `todomvc.js`.
+Let's fix this by re-compiling `todomvc.js` with leiningen.
 
 1. Save the changes you made to `render.cljs` in Light Table
    with `ctrl-s`
