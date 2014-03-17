@@ -46,8 +46,7 @@ the UI relate to transactions and state-changes in the application.
 4. Paste the URL in Light Table to replace `about:blank` and press enter.
 
 If you want you can open a browser console in Light Table with
-
-    `ctrl-space` -> _Console: Toggle console_
+`ctrl-space` -> _Console: Toggle console_.
 
 
 ## Open the Clojurescript code in a Light Table tab
@@ -64,7 +63,7 @@ First let's open the code in a new Light Table tab.
 4. In the workspace tree (sidebar on the left) open `application.cljs` which you
    will find in `todomvc/src/todomvc/application.cljs`
 
-You now have two tabs in Light Table; `Quiescent TodoMVC` and `application.cljs`
+You now have two tabs in Light Table; `Quiescent TodoMVC` and `application.cljs`.
 Let's put them side-by-side to get a better overview.
 
 5. `ctrl-space` -> _Tabset: Add a tabset_
@@ -89,7 +88,7 @@ For example, type `@(:state app-hook)` on a newline at the end of
 This will show the application-state.
 
 If the result of the evaluation is too big for the screen Light Table will
-only show the first bit. But if you can click on the evaluation result Light
+only show the first bit. But if you click on the evaluation result Light
 Table will expand it.
 
 To look at the list of todo-items evaluate
@@ -212,7 +211,7 @@ avoid most of the rendering.
 ```
 
 On my machine I'm not seeing any intermediate rendering. So it seems like
-React is doing its job!
+React is doing its job.
 
 
 ## Rendering with Quiescent
@@ -252,9 +251,6 @@ Open the elements-tab in your browser's development window and check for yoursel
 that there is a one-on-one relationship between the elements defined in `App` and
 the dom-elements within `<section id="todoapp"></section>`.
 
-[Here](https://github.com/levand/quiescent/blob/master/docs.md#creating-virtual-dom-elements)
-you can find more documentation on Quiescent dom-elements.
-
 Let's look, for example, at this expression at the end of the `Footer` component:
 
 ```clojure
@@ -280,6 +276,9 @@ This is because events are handled in the React virtual dom.
 For Chrome you can install _React Developer Tools_.
 This will give you an extra Development Tool tab with React specific
 information like, eg, the event handlers.
+
+[Here](https://github.com/levand/quiescent/blob/master/docs.md#creating-virtual-dom-elements)
+you can find more documentation on Quiescent dom-elements.
 
 
 ## Quiescent components
@@ -360,9 +359,9 @@ to this
                "Anything more?")
 ```
 
-Now you have the evaluate `(d/defcomponent Header ...)` with `ctrl-enter`.
+Now you have to evaluate `(d/defcomponent Header ...)` with `ctrl-enter`.
 
-Enter some todo's in the list to check the new placeholder.
+Enter some todo's in the list to check the new placeholder functionality.
 
 
 ## Compiling todomvc.js
@@ -398,7 +397,7 @@ As you will see _contained_ is the right word.
 `transact.cljs` is completely ignorant about the UI.
 It doesn't even know were the application state is stored.
 
-As a result the code `transact.cljs` can be moved from the browser
+As a result the code in `transact.cljs` can be moved from the browser
 to the JVM simply by changing the filename from `transact.cljs`
 to `transact.clj`.
 
@@ -420,20 +419,19 @@ Our next step is to run the same code on the JVM.
 This will only work if you have a JVM installed on your machine.
 
 If you don't have a JVM installed I would advice you to skip this last
-step of the walkthrough because you won't see anything difference
-from running the file as Clojurescript.
+step of the walkthrough because you won't see anything different.
 
 I tried to save the file as `transact.clj` from Light Table using `ctrl-shift-s`.
 But that does not work.
 Light Table is smart enough to leave the file extension as it is.
 
-1. Go to a terminal or file explorer and copy `transact.cljs` to `transact.clj`
+1. Go to a terminal or file manager and copy `transact.cljs` to `transact.clj`
 3. Right-click in the Light Table workspace tree and select _refresh folder_
 2. Open `transact.clj`
 3. Evaluate `transact.clj` with `ctrl-shift-enter`
 
 Now we can run our test on the JVM.
-Go to the last line of `transact.clj` and evaluate this expression:
+Go to the last line of `transact.clj` and evaluate the same expression:
 
 ```clojure
 (try-transactions
