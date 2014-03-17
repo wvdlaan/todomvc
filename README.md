@@ -260,7 +260,7 @@ Let's look, for example, at this expression at the end of the `Footer` component
             (str "Clear completed (" completed ")")))
 ```
 
-This defines a button that will only by included in the UI if the number of
+This defines a button that will only be included in the UI if the number of
 `completed` items is larger than zero.
 If the button is clicked the `[:clear-completed]` transaction is
 pushed on the `core.async` channel.
