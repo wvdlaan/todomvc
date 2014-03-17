@@ -109,7 +109,7 @@ the application state.
 
 ## Changing the application state
 
-If you look a few lines up in `application.cljs` you'll see
+If you look a few lines up in `application.cljs` you will see
 the expression `(swap! state transact transaction)` inside the
 `init-updates` function.
 This is the expression that processes the transactions coming in from
@@ -245,7 +245,7 @@ It takes two arguments:
 ## Quiescent dom-elements
 
 If you look at the definition of `App` in `render.cljs` you find several
-calls to functions like `d/div`, `d/section`, `d/output`, etc.
+calls to functions like `d/div`, `d/section`, `d/input`, etc.
 These are Quiescent-funcions that represent dom-elements.
 Open the elements-tab in your browser's development window and check for yourself
 that there is a one-on-one relationship between the elements defined in `App` and
