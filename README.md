@@ -6,12 +6,8 @@ the Amsterdam Clojure Meetup in March 2014.
 The walkthrough uses [Light Table](http://www.lighttable.com/) and the
 [Quiescent TodoMVC](https://github.com/levand/todomvc/tree/gh-pages/architecture-examples/quiescent)
 to demonstrate what it feels like to develop a web-UI
-with [Quiescent](https://github.com/levand/quiescent).
-
-You don't need to know a lot about Clojure for this walkthrough.
-A basic understanding is enough IMO.
-This is thanks to Light Table and Quiescent.
-They have significantly lowered the barriers to entry.
+with [Quiescent](https://github.com/levand/quiescent),
+a lightweight ClojureScript abstraction over ReactJS.
 
 To follow along you need to install
 [leiningen](https://github.com/technomancy/leiningen),
@@ -48,6 +44,10 @@ the UI relate to transactions and state-changes in the application.
 3. Return to the browser to copy the URL
    (eg; on my desktop it's `file:///home/walter/todomvc/index.html`)
 4. Paste the URL in Light Table to replace `about:blank` and press enter.
+
+If you want you can open a browser console in Light Table with
+
+    `ctrl-space` -> _Console: Toggle console_
 
 
 ## Open the Clojurescript code in a Light Table tab
@@ -88,6 +88,10 @@ For example, type `@(:state app-hook)` on a newline at the end of
 `application.cljs` and evaluate with `ctrl-enter`.
 This will show the application-state.
 
+If the result of the evaluation is too big for the screen Light Table will
+only show the first bit. But if you can click on the evaluation result Light
+Table will expand it.
+
 To look at the list of todo-items evaluate
 
 ```clojure
@@ -96,7 +100,7 @@ To look at the list of todo-items evaluate
 
 If you get `[]` as an answer it means that your todo-list is empty.
 Click on 'What needs to be done?' in the browser-tab and enter some
-todo's. Now go back to `application.cljs` tab, put
+todo's. Now go back to the `application.cljs` tab, put
 the cursor right after `(:items @(:state app-hook))` and press
 `ctrl-enter` again.
 
@@ -383,5 +387,59 @@ Let's fix this by re-compiling `todomvc.js` with leiningen.
 
 You can save yourself some time during development by
 running `lein cljsbuild auto`.
-This instructs `lein` to automatically re-compile `todomvc.js` whenever
+This instructs leiningen to automatically re-compile `todomvc.js` whenever
 a source-file is saved.
+
+
+## Application logic
+
+The application logic is contained in `transact.cljs`.
+As you will see _contained_ is the right word.
+`transact.cljs` is completely ignorant about the UI.
+It doesn't even know were the application state is stored.
+
+As a result the code `transact.cljs` can be moved from the browser
+to the JVM simply by changing the filename from `transact.cljs`
+to `transact.clj`.
+
+This might not be impressive for the todomvc application but for a larger
+application with a back-end it is a major advantage for it will allow you
+to run integrated tests involving the back-end logic _and_ the front-end logic.
+
+Open `transact.cljs` in a Light Table tab and go to the last line and evaluate
+this expression to test the application logic:
+
+```clojure
+(try-transactions
+ [[:add-item "bread"]
+  [:add-item "butter"]
+  [:toggle-item 10]])
+```
+
+Our next step is to run the same code on the JVM.
+This will only work if you have a JVM installed on your machine.
+
+If you don't have a JVM installed I would advice you to skip this last
+step of the walkthrough because you won't see anything difference
+from running the file as Clojurescript.
+
+I tried to save the file as `transact.clj` from Light Table using `ctrl-shift-s`.
+But that does not work.
+Light Table is smart enough to leave the file extension as it is.
+
+1. Go to a terminal or file explorer and copy `transact.cljs` to `transact.clj`
+3. Right-click in the Light Table workspace tree and select _refresh folder_
+2. Open `transact.clj`
+3. Evaluate `transact.clj` with `ctrl-shift-enter`
+
+Now we can run our test on the JVM.
+Go to the last line of `transact.clj` and evaluate this expression:
+
+```clojure
+(try-transactions
+ [[:add-item "bread"]
+  [:add-item "butter"]
+  [:toggle-item 10]])
+```
+
+Yep. Pretty boring. The same result as in the browser.
