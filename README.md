@@ -439,5 +439,3 @@ Go to the last line of `transact.clj` and evaluate the same expression:
   [:add-item "butter"]
   [:toggle-item 10]])
 ```
-
-Yep. Pretty boring. The same result as in the browser.
