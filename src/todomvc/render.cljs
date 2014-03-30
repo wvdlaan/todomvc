@@ -1,8 +1,7 @@
 (ns todomvc.render
-  (:require [cljs.core.async :refer [>!]]
+  (:require [cljs.core.async :refer [put!]]
             [quiescent :as q :include-macros true]
-            [quiescent.dom :as d])
-  (:require-macros [cljs.core.async.macros :refer [go]]))
+            [quiescent.dom :as d]))
 
 (defn enter-key?
   "Return true if an event was the enter key"
@@ -20,7 +19,7 @@
                       (fn [evt]
                         (when (enter-key? evt)
                           (let [text (.-value (.-target evt))]
-                            (go (>! channel [:add-item text]))
+                            (put! channel [:add-item text])
                             (set! (.-value (.-target evt)) ""))))
                       :autoFocus true})))
 
@@ -29,7 +28,7 @@
   [current-filter this-filter label href channel]
   (d/li {} (d/a {:className (when (= current-filter this-filter) "selected")
                  :href href
-                 :onClick #(do (go (>! channel [:set-filter this-filter]))
+                 :onClick #(do (put! channel [:set-filter this-filter])
                                false)}
                 label)))
 
@@ -52,7 +51,7 @@
               (Filters current-filter channel)
               (when (< 0 completed)
                 (d/button {:id "clear-completed"
-                           :onClick #(go (>! channel [:clear-completed]))}
+                           :onClick #(put! channel [:clear-completed])}
                           (str "Clear completed (" completed ")"))))))
 
 (defn class-name
@@ -78,26 +77,26 @@
                                       "hidden")
                                     (when editing "editing")})
            :onDoubleClick (fn [_]
-                            (go (>! channel [:start-edit id])))}
+                            (put! channel [:start-edit id]))}
           (d/div {:className "view"}
                  (d/input {:className "toggle"
                            :type "checkbox"
                            :checked completed
                            :onChange
                            (fn [_]
-                             (go (>! channel [:toggle-item id])))})
+                             (put! channel [:toggle-item id]))})
                  (d/label {} text)
                  (d/button {:className "destroy"
                             :onClick
                             (fn [_]
-                              (go (>! channel [:remove-item id])))}))
+                              (put! channel [:remove-item id]))}))
           (d/input (merge {:className "edit"
                            :defaultValue text
                            :onKeyDown (fn [evt] (when (enter-key? evt)
                                                  (.blur (.-target evt))))
                            :onBlur (fn [evt]
                                      (let [text (.-value (.-target evt))]
-                                       (go (>! channel [:complete-edit id text]))))}
+                                       (put! channel [:complete-edit id text])))}
                           (if editing {:autoFocus true} {}))))))
 
 (q/defcomponent TodoList
@@ -115,7 +114,7 @@
                     (d/input {:id "toggle-all"
                               :type "checkbox"
                               :checked all-done?
-                              :onChange #(go (>! channel [:toggle-all]))})
+                              :onChange #(put! channel [:toggle-all])})
                     (d/label {:htmlFor "toggle-all"}
                              "Mark all as complete")
                     (TodoList [current-filter items] channel))
