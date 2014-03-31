@@ -256,7 +256,7 @@ Let's look, for example, at this expression at the end of the `Footer` component
 ```clojure
 (when (< 0 completed)
   (d/button {:id "clear-completed"
-             :onClick #(go (>! channel [:clear-completed]))}
+             :onClick #(put! channel [:clear-completed])}
             (str "Clear completed (" completed ")")))
 ```
 
