@@ -246,7 +246,7 @@ It takes two arguments:
 
 If you look at the definition of `App` in `render.cljs` you find several
 calls to functions like `d/div`, `d/section`, `d/input`, etc.
-These are Quiescent-funcions that represent dom-elements.
+These are Quiescent-functions that represent dom-elements.
 Open the elements-tab in your browser's development window and check for yourself
 that there is a one-on-one relationship between the elements defined in `App` and
 the dom-elements within `<section id="todoapp"></section>`.
