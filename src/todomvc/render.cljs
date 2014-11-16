@@ -58,7 +58,7 @@
   "Convenience function for creating class names from sets. Nils will
   not be included."
   [classes]
-  (apply str (interpose " " (map identity classes))))
+  (apply str (interpose " " classes)))
 
 (defn hidden?
   "Given an item and the current application filter status, return
